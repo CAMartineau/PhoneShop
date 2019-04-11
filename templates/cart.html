@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+	{% if messages %}
+		{% for category, message in messages %}
+            <div class="alert alert-{{category}} alert-dismissible fade show" role="alert" id="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                {{ message }}
+            </div>
+		{% endfor %}
+	{% endif %}
+{% endwith %}
+
+		<h1>Votre panier d'achat</h1>
+		<br>
+		<h2>Produits:</h2>
+		<br>
+        <div class="container">
+			<div class="row">
+			{% for product in cartProduct %}
+				<div class="row">
+					<div class="col-md-8">
+					  <a href="#">
+						<img class="img-fluid rounded mb-3 mb-md-0" src="{{product.image}}" style="width: 1000px; max-height: 400px">
+					  </a>
+					</div>
+					<div class="col-md-4">
+					  <h3>{{product.name}}</h3>
+					  <p>{{product.description}}</p>
+	            	<h2>{{product.prix}} $</h2>
+						<h3>Quantité : </h3> <h3>{{product.qty}}</h3>
+						<form method="post" action="">
+							<button type="submit" name="idProduct" value="{{product.idProduct}}" class="btn btn-primary my-2 my-sm-0 navbarButton">Enlever de votre panier d'achat </button>
+					  </form>
+					</div>
+			  	</div>
+				<div class="row">
+					<hr>
+				</div>
+			{% endfor %}
+			</div>
+		</div>
+{% endblock %}

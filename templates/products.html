@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+	{% if messages %}
+		{% for category, message in messages %}
+            <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                {{ message }}
+            </div>
+		{% endfor %}
+	{% endif %}
+{% endwith %}
+		<div class="container">
+			<div class="row">
+			{% for product in products %}
+				<div class="card col-md-4" style="width: 18rem;">
+					<h1>{{product.id}}</h1>
+				  <img src="{{product.image}}" style="height: 18rem">
+				  <div class="card-body">
+				    <h2>{{product.name}}</h2>
+	            	<h3>{{product.prix}} $</h3>
+	            	<p><a class="btn btn-secondary" href="{{product.idProduct}}" role="button">Voir produit</a></p>
+				  </div>
+				</div>
+			{% endfor %}
+			</div>
+		</div>
+{% endblock %}

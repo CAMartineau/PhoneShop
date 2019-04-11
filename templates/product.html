@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+			{% for category, message in messages %}
+				<div class="alert alert-{{category}} alert-dismissible fade show" role="alert" id="alert">
+				  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				  </button>
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+		<div class="row">
+			<h1>{{product.name}}</h1>
+				<div class="col-md-8">
+				  <img class="img-fluid productImage" src="{{product.image}}" alt="">
+				</div>
+				<div class="col-md-4">
+				  <h3 class="my-3">Détails</h3>
+				  <ul>
+					<li>{{product.description}}</li>
+					<li>{{product.prix}} $</li>
+					  {% if session.session_on %}
+						<form method="post" action="">
+							<div class="form-group">
+								<label for="exampleFormControlSelect1">Quantité :</label>
+								<select name="quantity" class="form-control" id="exampleFormControlSelect1">
+								  <option value="1">1</option>
+								  <option value="2">2</option>
+								  <option value="3">3</option>
+								  <option value="4">4</option>
+								  <option value="5">5</option>
+								</select>
+							  </div>
+							<button type="submit" class="btn btn-primary my-2 my-sm-0 navbarButton"> Ajouter à votre panier d'achat </button>
+						</form>
+					  {% endif %}
+				  </ul>
+				</div>
+      		</div>
+
+{% endblock %}

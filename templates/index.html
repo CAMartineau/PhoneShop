@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html>
-<body>
+{% extends 'layout.html' %}
 
-<h1>Test projet Glo-2005</h1>
-
-<p>Hello world</p>
-
-</body>
-</html>
+{% block body %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+	{% if messages %}
+		{% for category, message in messages %}
+      <div class="alert alert-{{category}} alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		{{ message }}
+      </div>
+		{% endfor %}
+	{% endif %}
+{% endwith %}
+	<div class="jumbotron test-center">
+		<h1>Bienvenue</h1>
+		<p class="lead">Un site web pour acheter des articles en ligne!</p>
+		<p>Premièrement, il est possible de s'inscrire, ou de se connecter si vous avez déjà un compte. Ensuite, il est possible
+			de faire une recherche par type de produit, simplement en cliquant sur l'onglet Produits.</p>
+		<p>Bonne recherche!</p>
+	</div>
+{% endblock %}
