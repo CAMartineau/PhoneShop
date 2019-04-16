@@ -43,7 +43,7 @@ def getProductData(id):
     cur = connection.cursor()
 
     # selection d'un produit selon son ID
-    cur.execute("SELECT * FROM phoneShop.Produits WHERE id_produit =(%s);", id)
+    cur.execute("SELECT * FROM phoneShop.Produits WHERE id_produit = (%s);", id)
 
     data = cur.fetchone()
 

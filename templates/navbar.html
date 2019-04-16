@@ -16,12 +16,15 @@
 
     <div>
         {% if session.session_on %}
-        <a href="/logout"><button class="btn btn-primary my-2 my-sm-0 navbarButton"> Deconnexion</button></a>
+         <span class="navbar-text">
+				Bonjour  {{session['name']}}
+        </span>
+		<a href="/logout"><button class="btn btn-primary my-2 my-sm-0 navbarButton"> Deconnexion</button></a>
         <a href="/cart"><button class="btn btn-primary my-2 my-sm-0"><i class="fas fa-shopping-cart"></i>
         </button> </a>
         {% else %}
-        <a href="/login"><button class="btn btn-primary my-2 my-sm-0 navbarButton"> Connexion</button></a>
-        <a href="/signup"><button class="btn btn-primary my-2 my-sm-0 navbarButton"> Inscription</button></a>
+        <a href="/connection"><button class="btn btn-primary my-2 my-sm-0 navbarButton"> Connexion</button></a>
+        <a href="/inscription"><button class="btn btn-primary my-2 my-sm-0 navbarButton"> Inscription</button></a>
         {% endif %}
     </div>
 

@@ -14,14 +14,19 @@
 		{% endif %}
 	{% endwith %}
 		<div class="row">
-			<h1>{{product.name}}</h1>
+			<h1>{{product.model}}</h1>
 				<div class="col-md-8">
-				  <img class="img-fluid productImage" src="{{product.image}}" alt="">
+				  <img class="img-fluid productImage" src="{{product.photo}}" alt="" width="400" height="400">
 				</div>
 				<div class="col-md-4">
 				  <h3 class="my-3">Détails</h3>
 				  <ul>
-					<li>{{product.description}}</li>
+					<li>{{product.memory}}</li>
+					<li>{{product.display_size}}</li>
+					<li>{{product.weigth}}</li>
+					<li>{{product.bluetooth}}</li>
+					<li>{{product.cpu}}</li>
+					<li>{{product.headphone_jack}}</li>
 					<li>{{product.prix}} $</li>
 					  {% if session.session_on %}
 						<form method="post" action="">
