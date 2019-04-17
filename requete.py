@@ -7,7 +7,7 @@ def connectDB():
 # Cette méthode vas chercher tous produits dans la base de donnée
 def TousProduits(ModelInput,prixMin,prixMax):
 	    connexion = connectDB()  
-	    query = 'SELECT * FROM Produits WHERE modele LIKE (%s) AND prix BETWEEN (%s) AND (%s);'
+	    query = 'SELECT * FROM phoneShop.Produits WHERE modele LIKE (%s) AND prix BETWEEN (%s) AND (%s);'
 	    cursor = connexion.cursor(buffered=True)
 	    modele = ModelInput
 	    modele += '%'
@@ -60,7 +60,7 @@ def Produit(id):
 # Cette méthode vérifie si un utilisateur existe déjà dans la base de donnée
 def VerificationUserExistant(email):
 	connexion = connectDB()
-	query = "SELECT COUNT(*) FROM Utilisateurs WHERE email LIKE (%s)"
+	query = "SELECT COUNT(*) FROM UserphoneShop.Utilisateurs WHERE email LIKE (%s)"
 	cursor = connexion.cursor(buffered=True)
 	cursor.execute(query,(email,))
 	reponse = cursor.fetchone()
@@ -79,7 +79,7 @@ def VerificationUserExistant(email):
 # Cette méthode ajoute un utilisateur dans la base de donnée
 def AjoutUser(email,name,lastname,password):
 	connexion = connectDB()
-	query = "INSERT INTO Utilisateurs ( email, prenom, nom, motDepass) VALUES (%s, %s, %s, %s)"
+	query = "INSERT INTO UserphoneShop.Utilisateurs ( email, prenom, nom, motDepass) VALUES (%s, %s, %s, %s)"
 	cursor = connexion.cursor(buffered=True)
 	cursor.execute(query,(email,name,lastname,password,))
 	connexion.commit()
@@ -89,7 +89,7 @@ def AjoutUser(email,name,lastname,password):
 # Cette méthode vas chercher les informations d'un utilisateur dans la base de donnée
 def InfoUser(email):
 	connexion = connectDB()
-	query = "SELECT * FROM Utilisateurs WHERE email LIKE (%s)"
+	query = "SELECT * FROM UserphoneShop.Utilisateurs WHERE email LIKE (%s)"
 	cursor = connexion.cursor(buffered=True)
 	cursor.execute(query,(email,))
 	connexion.commit()
@@ -131,7 +131,7 @@ def ProduitsPannier(idUser):
     connexion = connectDB()
     cursor = connexion.cursor(buffered=True)
     cursor.execute(
-        "SELECT Produits.id_produit, Produits.modele, Produits.prix,Produits.imageUrl, Paniers.quantite FROM Produits INNER JOIN Paniers ON Produits.id_produit = Paniers.id_produit WHERE Paniers.id_user = (%s);", [str(idUser)])
+        "SELECT Produits.id_produit, Produits.modele, Produits.prix,Produits.imageUrl, Paniers.quantite FROM phoneShop.Produits INNER JOIN phoneShop.Paniers ON Produits.id_produit = Paniers.id_produit WHERE Paniers.id_user = (%s);", [str(idUser)])
     data = cursor.fetchall()
     productsData = []
     connexion.commit()

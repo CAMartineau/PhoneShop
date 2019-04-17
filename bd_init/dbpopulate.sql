@@ -1,4 +1,4 @@
-USE phoneShop;
+USE UserphoneShop;
 insert into Utilisateurs (id_user, email, prenom, nom, motDepass) values (1, 'ekleint0@statcounter.com', 'Euphemia', 'Kleint', '02989ce013ffd42e91233fd38ed1a953');
 insert into Utilisateurs (id_user, email, prenom, nom, motDepass) values (2, 'cwahlberg1@shareasale.com', 'Claudelle', 'Wahlberg', 'da1a953e0418deaf1f334911ba43ca9b');
 insert into Utilisateurs (id_user, email, prenom, nom, motDepass) values (3, 'cparadin2@merriam-webster.com', 'Casi', 'Paradin', '1dfe8591db74a56543cd9711ba3c586c');
@@ -100,7 +100,7 @@ insert into Utilisateurs (id_user, email, prenom, nom, motDepass) values (98, 'b
 insert into Utilisateurs (id_user, email, prenom, nom, motDepass) values (99, 'asacher2q@ucoz.ru', 'Adrian', 'Sacher', 'e0cb88261ab42e297ed510748449c30f');
 insert into Utilisateurs (id_user, email, prenom, nom, motDepass) values (100, 'mcausey2r@discovery.com', 'Meara', 'Causey', '1f185035ae5c44ae4dabb63746d95ea2');
 
-
+USE phoneShop;
 
 insert into Marques(id_marque, nom_marque, description_marque) values (1,'Apple', "Fabriquant de tous les telephones Iphones");
 insert into Marques(id_marque, nom_marque, description_marque) values (2,'Samsung', "Fabriquant de tous les telephones Samsung");
