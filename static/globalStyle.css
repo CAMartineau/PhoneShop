@@ -7,11 +7,11 @@
 }
 
 .bg-light {
-  background-color: lightblue !important; /* Change the background-color of the navbar */
+  background-color: black !important; /* Change the background-color of the navbar */
 }
 
 h1, h2 {
-  font-family: cursive; /* Change the font of h1 and h2 */
+  font-family: Times, serif; /* Change the font of h1 and h2 */
 }
 
 h2 {

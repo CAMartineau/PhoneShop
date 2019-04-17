@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
-from data import getOneProduit
+from data import getOneProduct
 import mysql.connector
 from mysql.connector import errorcode
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
@@ -45,33 +45,6 @@ def checkLoginForAccess(f):
 
     return wrap
 
-
-def getProductData(id):
-	
-	connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
-    
-	query = "SELECT * FROM phoneShop.Produits WHERE id_produit = (%s);"
-    # selection d'un produit selon son ID
-	cursor = connexion.cursor(buffered=True)
-	cursor.execute(query,(id,))
-	data = cursor.fetchone()
-	
-	productsData = {
-            'id_produit': id,
-            'prix': data[2],
-            'photo': data[3],
-            'memory': data[4],
-            'display_size': data[5],
-            'weigth': data[6],
-            'bluetooth': data[7],
-	    'cpu': data[8],
-	    'headphone_jack': data[9],
-	    'model': data[1],
-	    'id_suppliers': data[10]}
-		
-	cursor.close()
-	connexion.close()
-	return productsData
 
 class searchForm(Form):
     model = StringField([validators.Length(min=1, max=50)])
@@ -165,7 +138,7 @@ def product(id):
 
     if request.method == 'POST':
 	
-        product2 = getProductData(id)
+        product2 = getOneProduct(id)
         price = product2.get('prix')
         boolAddedToCart = addToCart(session['idUser'], id, request.form['quantity'], price)
         if (boolAddedToCart):
@@ -175,7 +148,7 @@ def product(id):
             flash('Le produit est déjà présent dans votre panier', category='warning')
             return redirect('/products/' + str(id) + '/')
 
-    return render_template('product.html', product=getProductData(id), userId=session['idUser'])
+    return render_template('product.html', product=getOneProduct(id), userId=session['idUser'])
 
 	
 class InscriptionForm(Form):
