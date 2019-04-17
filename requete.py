@@ -1,13 +1,37 @@
 import mysql.connector
 # Cette methode permet de se connecter a la base de donnee
 def connectDB():
-
-	connexion = mysql.connector.connect(user='root',password='example',host='mysql', database='phoneShop')
+	connexion = mysql.connector.connect(user='root',password='uTXukSvDgFXHTVzZ',host='mysql', database='phoneShop')
 	
 	return connexion
 
+def TousProduits(ModelInput,prixMin,prixMax):
+	    connexion = connectDB()  
+	    query = 'SELECT * FROM Produits WHERE model LIKE (%s) AND price BETWEEN (%s) AND (%s);'
+	    cursor = connexion.cursor(buffered=True)
+	    model = ModelInput
+	    model += '%'
+	    if prixMax == None: 
+	        prixMax = 1500
+	  
+	    if prixMin == None: 
+	        prixMin = 0
+	    cursor.execute(query,(model,prixMin,prixMax,))
+	    cursor.close()
+	    data = cursor.fetchall()
+	    productsData = []
+	    for row in data:
+	        productsData.append({
+				'idProduct': row[0],
+				'prix': row[2],
+				'name': row[1],
+				'category': row[5],
+				'image': row[3] })
+	    products = productsData
+	    return products
+ 
 # Cette methode permet d`aller chercher les informations d`un produit en particulier dans la table Products
-def getOneProduct(id):
+def Produit(id):
     connexion = connectDB()
     
     query = "SELECT * FROM phoneShop.Produits WHERE id_produit = (%s);"
@@ -32,7 +56,8 @@ def getOneProduct(id):
     cursor.close()
     connexion.close()
     return productsData
-	
+
+
 def VerificationUserExistant(email):
 	connexion = connectDB()
 	query = "SELECT COUNT(*) FROM Users WHERE email LIKE (%s)"

@@ -18,7 +18,7 @@
 <div class="container">
     <br/>
 	 <div class="row justify-content-center">
-                        <div class="col-12 col-md-10 col-lg-8">
+                        <div class="col-12 col-md-12 col-lg-8">
                             <form class="card card-sm" method="post" action="" >
                                 <div class="card-body row no-gutters align-items-center">
                                     <div class="col-auto">
@@ -27,7 +27,13 @@
 									
                                     <!--end of col-->
                                     <div class="col" >
-										{{ form.model (class="form-control") }}
+										{{ form.model.label }}: {{ form.model (class="form-control") }}
+                                    </div>
+									<div class="col" >
+										{{ form.prixMin.label }}: {{ form.prixMin (class="form-control" ) }}
+                                    </div>
+									<div class="col" >
+										{{ form.prixMax.label }}: {{ form.prixMax (class="form-control" ) }}
                                     </div>
                                     <!--end of col-->
 									<div class="form-group">

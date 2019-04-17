@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
-from requete import getOneProduct, VerificationUserExistant, AjoutUser, InfoUser, EnleverPanier, ProduitsPannier, AjoutPanier
+from requete import Produit, VerificationUserExistant, AjoutUser, InfoUser, EnleverPanier, ProduitsPannier, AjoutPanier, TousProduits
 import mysql.connector
 from formulaire import searchForm, InscriptionForm , ConnectionForm
 from mysql.connector import errorcode
@@ -30,47 +30,15 @@ def checkLoginForAccess(f):
 
 @application.route('/products', methods=['GET', 'POST'])
 def products():
-    
     form = searchForm(request.form)
-    connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
-    # fetch les categories des produits
-    query = 'SELECT * FROM Produits;'
-    cursor = connexion.cursor(buffered=True)
-    cursor.execute(query)
-    cursor.close()
-    data = cursor.fetchall()
-    productsData = []
-    for row in data:
-            productsData.append({
-                'idProduct': row[0],
-                'prix': row[2],
-                'name': row[1],
-                'category': row[5],
-                'image': row[3]
-            })
-    products = productsData
-	
+    model = form.model.data
+    prixMin = form.prixMin.data
+    prixMax = form.prixMax.data
+    products = TousProduits(model,prixMin,prixMax)
     if request.method == 'POST':
 	    form = searchForm(request.form)
-	    connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
-	    query = 'SELECT * FROM Produits WHERE model LIKE (%s);'
-	    cursor = connexion.cursor(buffered=True)
 	    model = form.model.data
-	    model += '%'
-	    cursor.execute(query,(model,))
-	    cursor.close()
-	    data = cursor.fetchall()
-	    productsData = []
-	    for row in data:
-	        productsData.append({
-                'idProduct': row[0],
-                'prix': row[2],
-                'name': row[1],
-                'category': row[5],
-                'image': row[3]
-             })
-
-	    products = productsData
+	    products = TousProduits(model,prixMin,prixMax)
 	    return render_template('products.html',products=products, form=form)		
     return render_template('products.html', products=products, form=form)
 	
@@ -78,7 +46,7 @@ def products():
 @checkLoginForAccess
 def product(id):
     if request.method == 'POST':	
-        product = getOneProduct(id)
+        product = Produit(id)
         price = product.get('prix')
         boolAddedToCart = AjoutPanier(session['idUser'], id, request.form['quantity'], price)
         if (boolAddedToCart):
@@ -87,7 +55,7 @@ def product(id):
         else:
             flash('Le produit est déjà présent dans votre panier', category='warning')
             return redirect('/products/' + str(id) + '/')
-    return render_template('product.html', product=getOneProduct(id), userId=session['idUser'])
+    return render_template('product.html', product=Produit(id), userId=session['idUser'])
 	
 @application.route('/inscription', methods=['GET', 'POST'])
 def inscription():

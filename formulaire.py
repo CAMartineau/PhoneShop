@@ -1,8 +1,10 @@
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from wtforms import Form, StringField, IntegerField, TextAreaField, PasswordField, validators
 
 class searchForm(Form):
-    model = StringField([validators.Length(min=1, max=50)])
-	
+    model = StringField('Nom du model',[validators.Length(min=1, max=50)])
+    prixMin = IntegerField('Prix min')
+    prixMax = IntegerField('Prix max')
+
 class InscriptionForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
     lastname = StringField('Lastname', [validators.Length(min=4, max=25)])
