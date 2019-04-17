@@ -6,9 +6,10 @@
   list-style-type: none; /* No bullet in list */
 }
 
-.bg-light {
-  background-color: Black !important; /* Change the background-color of the navbar */
+nav {
+   background-color: Black !important;
 }
+
 
 h1, h2 {
   font-family: Times, serif; /* Change the font of h1 and h2 */
