@@ -88,21 +88,14 @@ def inscription():
 def connection():
     
     form = ConnectionForm(request.form)
-	
-    connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100',database='phoneShop')	
-	
-    cursor = connexion.cursor(buffered=True)
-
     if request.method == 'POST':
         email = form.email.data
         existe = VerificationUserExistant(email)
         # si le email n'existe pas, la reponse est vide
         if existe == 0:
             flash("L'utilisateur n'existe pas ou le mot de passe ne correspond pas", category='warning')
-            cursor.close()
             return render_template('connection.html', form=form)
         else:
-			
             UserInfo = InfoUser(email)
             for row in UserInfo:
                         hashedpwd = row[4]
@@ -115,13 +108,11 @@ def connection():
                             session['session_on'] = True
                             session['email'] = email
                             session['idUser'] = userId
-                            cursor.close()
                             return redirect('/')
 
             # cas ou le mot de passe est faux
                         else:
                             flash("L'utilisateur n'existe pas ou le mot de passe ne correspond pas", category='warning')
-                            cursor.close()
                             return render_template('connection.html', form=form)
 
     return render_template('connection.html', form=form)

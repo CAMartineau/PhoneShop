@@ -1,22 +1,22 @@
 import mysql.connector
-# Cette methode permet de se connecter a la base de donnee
+# Cette méthode permet de se connecter a la base de donnee
 def connectDB():
 	connexion = mysql.connector.connect(user='root',password='uTXukSvDgFXHTVzZ',host='mysql', database='phoneShop')
 	
 	return connexion
-
+# Cette méthode vas chercher tous produits dans la base de donnée
 def TousProduits(ModelInput,prixMin,prixMax):
 	    connexion = connectDB()  
-	    query = 'SELECT * FROM Produits WHERE model LIKE (%s) AND price BETWEEN (%s) AND (%s);'
+	    query = 'SELECT * FROM Produits WHERE modele LIKE (%s) AND prix BETWEEN (%s) AND (%s);'
 	    cursor = connexion.cursor(buffered=True)
-	    model = ModelInput
-	    model += '%'
+	    modele = ModelInput
+	    modele += '%'
 	    if prixMax == None: 
 	        prixMax = 1500
 	  
 	    if prixMin == None: 
 	        prixMin = 0
-	    cursor.execute(query,(model,prixMin,prixMax,))
+	    cursor.execute(query,(modele,prixMin,prixMax,))
 	    cursor.close()
 	    data = cursor.fetchall()
 	    productsData = []
@@ -30,7 +30,7 @@ def TousProduits(ModelInput,prixMin,prixMax):
 	    products = productsData
 	    return products
  
-# Cette methode permet d`aller chercher les informations d`un produit en particulier dans la table Products
+# Cette méthode permet d`aller chercher les informations d`un produit en particulier dans la table Products
 def Produit(id):
     connexion = connectDB()
     
@@ -50,17 +50,17 @@ def Produit(id):
             'bluetooth': data[7],
 	    'cpu': data[8],
 	    'headphone_jack': data[9],
-	    'model': data[1],
+	    'modele': data[1],
 	    'id_suppliers': data[10]}
 		
     cursor.close()
     connexion.close()
     return productsData
 
-
+# Cette méthode vérifie si un utilisateur existe déjà dans la base de donnée
 def VerificationUserExistant(email):
 	connexion = connectDB()
-	query = "SELECT COUNT(*) FROM Users WHERE email LIKE (%s)"
+	query = "SELECT COUNT(*) FROM Utilisateurs WHERE email LIKE (%s)"
 	cursor = connexion.cursor(buffered=True)
 	cursor.execute(query,(email,))
 	reponse = cursor.fetchone()
@@ -76,18 +76,20 @@ def VerificationUserExistant(email):
 		connexion.close()
 	return utilisateur
 
+# Cette méthode ajoute un utilisateur dans la base de donnée
 def AjoutUser(email,name,lastname,password):
 	connexion = connectDB()
-	query = "INSERT INTO Users ( email, prenom, nom, motDepass) VALUES (%s, %s, %s, %s)"
+	query = "INSERT INTO Utilisateurs ( email, prenom, nom, motDepass) VALUES (%s, %s, %s, %s)"
 	cursor = connexion.cursor(buffered=True)
 	cursor.execute(query,(email,name,lastname,password,))
 	connexion.commit()
 	cursor.close()
 	connexion.close()
 
+# Cette méthode vas chercher les informations d'un utilisateur dans la base de donnée
 def InfoUser(email):
 	connexion = connectDB()
-	query = "SELECT * FROM Users WHERE email LIKE (%s)"
+	query = "SELECT * FROM Utilisateurs WHERE email LIKE (%s)"
 	cursor = connexion.cursor(buffered=True)
 	cursor.execute(query,(email,))
 	connexion.commit()
@@ -96,12 +98,13 @@ def InfoUser(email):
 	connexion.close()
 	return InformationUser
 
-def AjoutPanier(id_user, id_produit, quantity, unitPrice):
+# Cette méthode ajoute dans le Paniers d'un utilisateur un produit
+def AjoutPanier(id_user, id_produit, quantity, prix_unitaire):
     connexion = connectDB()
     cursor = connexion.cursor(buffered=True)
-    cursor.execute("SELECT * FROM phoneShop.Pannier WHERE id_user = %s AND id_Produit = %s", [str(id_user), str(id_produit)])
+    cursor.execute("SELECT * FROM phoneShop.Paniers WHERE id_user = %s AND id_Produit = %s", [str(id_user), str(id_produit)])
     if cursor.rowcount == 0:
-        cursor.execute("INSERT INTO phoneShop.Pannier (id_user, id_produit, quantity, unitPrice) VALUES ( %s, %s, %s, %s);",[str(id_user), str(id_produit), str(quantity), str(unitPrice)])
+        cursor.execute("INSERT INTO phoneShop.Paniers (id_user, id_produit, quantite, prix_unitaire) VALUES ( %s, %s, %s, %s);",[str(id_user), str(id_produit), str(quantity), str(prix_unitaire)])
         connexion.commit()
         return True
     else:
@@ -109,24 +112,26 @@ def AjoutPanier(id_user, id_produit, quantity, unitPrice):
     cursor.close()
     connexion.close()
 
+# Cette méthode enlève un produit du Paniers d'un utilisateur
 def EnleverPanier(id_user, id_Produit):
     connexion = connectDB()
     cursor = connexion.cursor(buffered=True)
-    cursor.execute("SELECT * FROM phoneShop.Pannier WHERE id_user = %s AND id_produit = %s", [str(id_user), str(id_Produit)])
+    cursor.execute("SELECT * FROM phoneShop.Paniers WHERE id_user = %s AND id_produit = %s", [str(id_user), str(id_Produit)])
     if cursor.rowcount > 0:
-        cursor.execute("DELETE FROM phoneShop.Pannier WHERE id_user = %s AND id_produit = %s", [str(id_user), str(id_Produit)])
+        cursor.execute("DELETE FROM phoneShop.Paniers WHERE id_user = %s AND id_produit = %s", [str(id_user), str(id_Produit)])
         connexion.commit()
         return True
     else:
         return False
     cursor.close()
     connexion.close()	
-	
+
+# Cette méthode vas chercher les produits dans le Paniers de l'utilisateur qui sont contenue dans la base de donnée
 def ProduitsPannier(idUser):
     connexion = connectDB()
     cursor = connexion.cursor(buffered=True)
     cursor.execute(
-        "SELECT Produits.id_produit, Produits.model, Produits.price,Produits.imageUrl, Pannier.quantity FROM Produits INNER JOIN Pannier ON Produits.id_produit = Pannier.id_produit WHERE Pannier.id_user = (%s);", [str(idUser)])
+        "SELECT Produits.id_produit, Produits.modele, Produits.prix,Produits.imageUrl, Paniers.quantite FROM Produits INNER JOIN Paniers ON Produits.id_produit = Paniers.id_produit WHERE Paniers.id_user = (%s);", [str(idUser)])
     data = cursor.fetchall()
     productsData = []
     connexion.commit()

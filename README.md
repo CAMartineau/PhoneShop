@@ -1,18 +1,35 @@
-PhoneShop
+# phoneShop
 
-# Aller dans Docker et dans le dossier qui contient l'application 
+phoneShop est un magasin en ligne de téléphone
 
-# Partir l'application ; 
+## Getting Started
 
-docker-compose up
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-# Arreter l'application ;
+### Prerequisites
 
-docker-compose down 
+```
+Docker
+```
 
-# Delete l'application (Vous devez faire cela si vous changer app.py, requirements.txt) ; 
+### Deployment
 
-docker-compose down --rmi all
+Dans la racine du dossier
+
+```
+docker-compose run 
+```
+
+## Built With
+
+* [Bootstrap](http://www.dropwizard.io/1.0.2/docs/) - Pour le style du site web
+* [Wtform](https://maven.apache.org/) - formulaire python
 
 
-# L'application roule sur le port 5000 donc pour Linux : Localhost:5000 , pour Windows : IPDOCKER:5000
+## Authors
+
+* **Charles-André Martineau**
+* **Mamadou-Dioulde Diallo**
+* **Mohamed Djama Ibrahim**
+
+
