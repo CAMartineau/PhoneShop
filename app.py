@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
-#from data import getData, getProductData, getOrderLineProduct, addToOrderLine, deleteToOrderLine, connectDB
+from data import getOneProduit
 import mysql.connector
 from mysql.connector import errorcode
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
@@ -41,7 +41,7 @@ def checkLoginForAccess(f):
             return f(*args, **kwargs)
         else:
             flash("Veuillez d'abord vous connecter", 'danger')
-            return redirect('/login')
+            return redirect('/inscription')
 
     return wrap
 
@@ -57,7 +57,7 @@ def getProductData(id):
 	data = cursor.fetchone()
 	
 	productsData = {
-            'idProduct': data[0],
+            'id_produit': id,
             'prix': data[2],
             'photo': data[3],
             'memory': data[4],
@@ -73,9 +73,13 @@ def getProductData(id):
 	connexion.close()
 	return productsData
 
+class searchForm(Form):
+    model = StringField([validators.Length(min=1, max=50)])
 
 @application.route('/products', methods=['GET', 'POST'])
 def products():
+    
+    form = searchForm(request.form)
     connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
     # fetch les categories des produits
     query = 'SELECT * FROM Produits;'
@@ -93,57 +97,83 @@ def products():
                 'image': row[3]
             })
     products = productsData
-    # envoie la liste des categories a la page catogories.html
-    return render_template('products.html', products=products)
 	
+    if request.method == 'POST':
+	    form = searchForm(request.form)
+	    connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
+	    query = 'SELECT * FROM Produits WHERE model LIKE (%s);'
+	    cursor = connexion.cursor(buffered=True)
+	    model = form.model.data
+	    model += '%'
+	    cursor.execute(query,(model,))
+	    cursor.close()
+	    data = cursor.fetchall()
+	    productsData = []
+	    for row in data:
+	        productsData.append({
+                'idProduct': row[0],
+                'prix': row[2],
+                'name': row[1],
+                'category': row[5],
+                'image': row[3]
+             })
 
-    connection = connectDB()
-    cur = connection.cursor()
+	    products = productsData
+	    return render_template('products.html',products=products, form=form)		
+    return render_template('products.html', products=products, form=form)
 
-    # selectionne tous les produits avec le model  spécifié
-    cur.execute("SELECT * FROM phoneShop.Produits WHERE model LIKE (%s);", mymodel)
+@application.route('/products/search', methods=['GET', 'POST'])
+def search():
+	    form = searchForm(request.form)
+	    connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
+	    query = 'SELECT * FROM Produits WHERE model LIKE (%s) ;'
+	    cursor = connexion.cursor(buffered=True)
+	    model = form.model.data
+	    cursor.execute(query,(model,))
+	    cursor.close()
+	    data = cursor.fetchall()
+	    productsData = []
+	    for row in data:
+	        productsData.append({
+                'idProduct': row[0],
+                'prix': row[2],
+                'name': row[1],
+                'category': row[5],
+                'image': row[3]
+             })
 
-    data = cur.fetchall()
-    productsData = []
+	    products = productsData
+	    return render_template('products.html',products=products, form=form)	
 
-    # print(data)
-    for row in data:
-        # creation dun vecteur avec des tuples de produit
-        productsData.append({
-            'idProduct': row[0],
-            'prix': row[2],
-            'photo': row[3],
-            'memory': row[4],
-            'display_size': row[5],
-            'weigth': row[6],
-            'bluetooth': row[7],
-	    'cpu': row[8],
-	    'headphone_jack': row[9],
-	    'model': row[1],
-	    'id_suppliers': row[10]
-        })
-
+def addToCart(id_user, id_produit, quantity, unitPrice):
+    connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
+    cur = connexion.cursor(buffered=True)
+    cur.execute("SELECT * FROM phoneShop.Pannier WHERE id_user = %s AND id_Produit = %s", [str(id_user), str(id_produit)])
+    if cur.rowcount == 0:
+        cur.execute("INSERT INTO phoneShop.Pannier (id_user, id_produit, quantity, unitPrice) VALUES ( %s, %s, %s, %s);",[str(id_user), str(id_produit), str(quantity), str(unitPrice)])
+        connexion.commit()
+        return True
+    else:
+        return False
     cur.close()
-    connection.close()
-    return productsData
-
-
-@application.route('/<string:id>/', methods=['GET', 'POST'])
+    connexion.close()
+	
+@application.route('/products/<string:id>/', methods=['GET', 'POST'])
 @checkLoginForAccess
 def product(id):
 
 
     if request.method == 'POST':
 	
-		
-	
-        boolAddedToCart = addToCart(session['idUser'], id, request.form['quantity'])
+        product2 = getProductData(id)
+        price = product2.get('prix')
+        boolAddedToCart = addToCart(session['idUser'], id, request.form['quantity'], price)
         if (boolAddedToCart):
             flash('Produit ajouter à votre panier', category='info')
-            return redirect('/products/category/' + str(category) + '/' + str(id) + '/')
+            return redirect('/products/' + str(id) + '/')
         else:
             flash('Le produit est déjà présent dans votre panier', category='warning')
-            return redirect('/products/category/' + str(category) + '/' + str(id) + '/')
+            return redirect('/products/' + str(id) + '/')
 
     return render_template('product.html', product=getProductData(id), userId=session['idUser'])
 
@@ -154,9 +184,8 @@ class InscriptionForm(Form):
     email = StringField('Adresse courriel', [validators.Email(message="Cette adresse email est invalide"),
                                              validators.Length(max=100, message="Cette adresse email est trop longue")])
 
-    # mots de passe verifier par RegEx
     password = PasswordField('Mot de passe',
-                             [validators.EqualTo('passwordConfirm', message='les mots de passes doivent correspondre'), validators.regexp(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$", message='Le mot de passe doit contenir au moins 8 caracteres, 1 chiffre et une lettre')])
+                             [validators.Required(),validators.EqualTo('passwordConfirm', message='Passwords must match')])
     
     passwordConfirm = PasswordField('Confirmer le mot de passe')
 
@@ -170,7 +199,7 @@ def inscription():
 
     cursor = connexion.cursor(buffered=True)
     #form = SignUpForm(request.form)
-    if request.method == 'POST':
+    if request.method == 'POST' and form.validate():
         name = form.name.data
         email = form.email.data
         lastname = form.lastname.data
@@ -258,10 +287,64 @@ def connection():
 def logout():
     session['session_on'] = False
     session['email'] = ''
+    session['idUser'] = ''
     flash('Vous avez été deconnecté', category='success')
     return redirect('/')
 
 	
+def deleteToCart(idUser, idProduct):
+    connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
+    cur = connexion.cursor(buffered=True)
+    cur.execute("SELECT * FROM phoneShop.Pannier WHERE id_user = %s AND id_produit = %s", [str(idUser), str(idProduct)])
+    if cur.rowcount > 0:
+        cur.execute("DELETE FROM phoneShop.Pannier WHERE id_user = %s AND id_produit = %s", [str(idUser), str(idProduct)])
+        connexion.commit()
+        return True
+    else:
+        return False
+    cur.close()
+    connexion.close()	
+	
+
+def getCartProduct(idUser):
+    connexion = mysql.connector.connect(user='root',password='example',host='192.168.99.100', database='phoneShop')
+    cur = connexion.cursor(buffered=True)
+    cur.execute(
+        "SELECT Produits.id_produit, Produits.model, Produits.price,Produits.imageUrl, Pannier.quantity FROM Produits INNER JOIN Pannier ON Produits.id_produit = Pannier.id_produit WHERE Pannier.id_user = (%s);",
+        [str(idUser)])
+    data = cur.fetchall()
+    productsData = []
+
+    # print(data)
+    for row in data:
+        productsData.append({
+            'idProduct': row[0],
+            'prix': row[2],
+            'name': row[1],
+            'image': row[3],
+            'qty': row[4],
+            'idUser': idUser
+        })
+
+    cur.close()
+    connexion.close()
+
+    return productsData	
+	
+@application.route("/panier", methods=['GET', 'POST'])
+@checkLoginForAccess
+def panier():
+    if request.method == 'POST':
+        boolIsInCart = deleteToCart(session['idUser'], int(request.form['idProduct']))
+        if (boolIsInCart):
+            flash('Produit retirer à votre panier', category='info')
+            return redirect('/panier')
+        else:
+            flash("Le produit n'est pas présent dans votre panier", category='warning')
+            return redirect('/panier')
+    return render_template('panier.html',cartProduct=getCartProduct(session['idUser']))
+
+	#cartProduct=getCartProduct(session['idUser']
 application.run('0.0.0.0',8080)
 if __name__ == '__main__':
     application.run(debug=True)
